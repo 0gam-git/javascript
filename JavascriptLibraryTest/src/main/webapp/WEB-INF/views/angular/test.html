@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>test</title>
+
+<!-- angular js -->
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+
+<style>
+input.ng-invalid {
+	background-color: pink;
+}
+
+input.ng-valid {
+	background-color: lightgreen;
+}
+</style>
+</head>
+<body ng-app="testApp">
+
+	<div ng-init="name='yj'" ng-controller="testController">
+
+		<p>
+			input : <input type="
+		text" ng-model="name" />
+		</p>
+
+		bind : <span ng-bind="name" id="spanId"></span>
+		<hr />
+		<p>
+			scope : The name is <span>{{name}}</span>
+		</p>
+		<hr />
+		<p>
+			root scope : The name is <span>{{color}}</span>
+		</p>
+
+
+		<hr />
+		<p>My first expression: {{ 5 + 5 }}</p>
+		<hr />
+
+		First Name: <input type="text" ng-model="firstName" /><br /> Last
+		Name: <input type="text" ng-model="lastName" /><br /> <br /> Full
+		Name: {{firstName + " " + lastName}} <br /> Controller Name :
+		{{fullName()}}
+
+		<hr />
+		<div ng-controller="namesCtrl">
+			<ul>
+				<li ng-repeat="x in names">{{ x.name + ', ' + x.country }}</li>
+			</ul>
+		</div>
+		<hr />
+		<div ng-controller="responseController">
+			<p>Server get Text : {{result}}</p>
+		</div>
+		<hr />
+		<div ng-controller="timeController">
+
+			<h2>The time : {{theTime}}</h2>
+		</div>
+		<div ng-controller="standardHttpController">
+
+			<p>Server get content : {{content}}</p>
+			<p>Server get code : {{statusCode}}</p>
+		</div>
+		<hr />
+
+		<div>
+			First Name:<br /> <input type="text" ng-model="user.firstName" /><br />
+			Last Name:<br /> <input type="text" ng-model="user.lastName" />
+			<p>form = {{user}}</p>
+		</div>
+
+		<hr />
+		<p>
+			Name: <input name="myName" ng-model="user1.myName" required="true" />
+			<span
+				ng-show='myForm.myName.$touched &amp;&amp; myForm.myName.$invalid'>The
+				name is required.</span>
+		</p>
+
+		<p>
+			Address: <input name="myAddress" ng-model="user1.myAddress"
+				required="true" />
+		</p>
+		<p>form = {{user1}}</p>
+
+
+		<hr />
+		<h2>Validation Example</h2>
+		<form ng-controller="validateCtrl" name="myForm" novalidate="true">
+
+			<p>
+				Username:<br /> <input type="text" name="user" ng-model="user"
+					required="true" /> <span style="color: red"
+					ng-show="myForm.user.$dirty &amp;&amp; myForm.user.$invalid">
+					<span ng-show="myForm.user.$error.required">Username is
+						required.</span>
+				</span>
+			</p>
+
+			<p>
+				Email:<br /> <input type="email" name="email" ng-model="email"
+					required="true" /> <span style="color: red"
+					ng-show="myForm.email.$dirty &amp;&amp; myForm.email.$invalid">
+					<span ng-show="myForm.email.$error.required">Email is
+						required.</span> <span ng-show="myForm.email.$error.email">Invalid
+						email address.</span>
+				</span>
+			</p>
+
+			<p>
+				<input type="submit"
+					ng-disabled="myForm.user.$dirty &amp;&amp; myForm.user.$invalid ||
+  myForm.email.$dirty &amp;&amp; myForm.email.$invalid" />
+			</p>
+
+		</form>
+
+
+
+	</div>
+
+
+	<script>
+		var app = angular.module('testApp', []);
+
+		//root 
+		app.run(function($rootScope) {
+			$rootScope.color = 'red';
+		});
+
+		//controller
+		app.controller('testController', function($scope) {
+			$scope.firstName = "youngjun";
+			$scope.lastName = "byeon";
+
+			$scope.fullName = function() {
+				return $scope.firstName + " " + $scope.lastName;
+			}
+		});
+
+		app.controller('namesCtrl', function($scope) {
+			$scope.names = [ {
+				name : 'Jani',
+				country : 'Norway'
+			}, {
+				name : 'Hege',
+				country : 'Sweden'
+			}, {
+				name : 'Kai',
+				country : 'Denmark'
+			} ];
+		});
+
+		app.controller('responseController', function($scope, $http) {
+			$http.get("response").then(function(response) {
+				$scope.result = response.data;
+			});
+		});
+
+		app.controller('timeController', function($scope, $interval) {
+			$scope.theTime = new Date().toLocaleTimeString();
+			$interval(function() {
+				$scope.theTime = new Date().toLocaleTimeString();
+			}, 1000);
+		});
+
+		app.controller('standardHttpController', function($scope, $http) {
+			$http({
+				method : "GET",
+				url : "/angular/response"
+			}).then(function mySucces(response) {
+				$scope.content = response.data;
+				$scope.statusCode = response.status;
+
+			}, function myError(response) {
+				$scope.content = response.statusText;
+
+			});
+		});
+
+		app.controller('validateCtrl', function($scope) {
+			$scope.user = 'John Doe';
+			$scope.email = 'john.doe@gmail.com';
+		});
+	</script>
+</body>
+</html>
